@@ -27,12 +27,13 @@ theme_set(theme_linedraw(base_size = 15))
 [https://www.ni.com/docs/en-US/bundle/labview/page/lvwave/normalize_waveform.html](https://www.ni.com/docs/en-US/bundle/labview/page/lvwave/normalize_waveform.html)
 
 ```{r}
-generate_waveform <- function(freq_hzs, amplitudes, duration_s = 1.0, sps = 100) {
-  t_samples = seq(sps * duration_s)
+generate_waveform <- function(freq_hzs, amplitudes, decay_tau = 1.0, duration_s = 1.0, sps = 200) {
+  t_samples <- seq(sps * duration_s)
+  exp_decay <- exp(-t_samples / (decay_tau * sps))
   waveform_matrix = matrix(nrow = length(freq_hzs), ncol = length(t_samples))
   
   for (i in seq_along(freq_hzs)) {
-    waveform_matrix[i, ] <- amplitudes[i] * cos(2 * pi * freq_hzs[i] * t_samples / sps)
+    waveform_matrix[i, ] <- amplitudes[i] * cos(2 * pi * freq_hzs[i] * t_samples / sps) * exp_decay
   }
   
   wv <- colSums(waveform_matrix)
@@ -54,11 +55,8 @@ df_from_waveform <- function(waveform_list) {
 ## Generate a more complex waveform
 
 ```{r}
-waveform_2 <- generate_waveform(c(4.0, 5.0, 6.0), c(1.0, 1.0, 1.0)) %>%
+waveform_2 <- generate_waveform(c(4.0), c(1.0)) %>%
   df_from_waveform()
-
-min(waveform_2$waveform)
-max(waveform_2$waveform)
 
 ggplot(waveform_2, aes(x = t_samples, y = waveform)) +
   geom_line()
