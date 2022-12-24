@@ -38,16 +38,9 @@ generate_waveform <- function(freq_hzs, amplitudes, decay_tau = 1.0, duration_s 
   
   wv <- colSums(waveform_matrix)
   
-  list(
+  data.frame(
     t_samples = t_samples,
     waveform = wv
-  )
-}
-
-df_from_waveform <- function(waveform_list) {
-  data.frame(
-    t_samples = waveform_list$t_samples,
-    waveform = waveform_list$waveform
   )
 }
 ```
@@ -55,9 +48,7 @@ df_from_waveform <- function(waveform_list) {
 ## Generate a more complex waveform
 
 ```{r}
-waveform_2 <- generate_waveform(c(4.0), c(1.0)) %>%
-  df_from_waveform()
-
+waveform_2 <- generate_waveform(c(4.0), c(1.0))
 ggplot(waveform_2, aes(x = t_samples, y = waveform)) +
   geom_line()
 ```
