@@ -1,0 +1,65 @@
+---
+title: "fft.Rmd"
+author: "Alicia Key"
+date: "2022-12-24"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Libraries
+
+```{r}
+library(magrittr)
+library(ggplot2)
+```
+
+## Set a theme
+
+```{r}
+theme_set(theme_linedraw(base_size = 15))
+```
+
+## Functions for generating waveforms
+
+[https://www.ni.com/docs/en-US/bundle/labview/page/lvwave/normalize_waveform.html](https://www.ni.com/docs/en-US/bundle/labview/page/lvwave/normalize_waveform.html)
+
+```{r}
+generate_waveform <- function(freq_hzs, amplitudes, duration_s = 1.0, sps = 100) {
+  t_samples = seq(sps * duration_s)
+  waveform_matrix = matrix(nrow = length(freq_hzs), ncol = length(t_samples))
+  
+  for (i in seq_along(freq_hzs)) {
+    waveform_matrix[i, ] <- amplitudes[i] * cos(2 * pi * freq_hzs[i] * t_samples / sps)
+  }
+  
+  wv <- colSums(waveform_matrix)
+  
+  list(
+    t_samples = t_samples,
+    waveform = wv
+  )
+}
+
+df_from_waveform <- function(waveform_list) {
+  data.frame(
+    t_samples = waveform_list$t_samples,
+    waveform = waveform_list$waveform
+  )
+}
+```
+
+## Generate a more complex waveform
+
+```{r}
+waveform_2 <- generate_waveform(c(4.0, 5.0, 6.0), c(1.0, 1.0, 1.0)) %>%
+  df_from_waveform()
+
+min(waveform_2$waveform)
+max(waveform_2$waveform)
+
+ggplot(waveform_2, aes(x = t_samples, y = waveform)) +
+  geom_line()
+```
