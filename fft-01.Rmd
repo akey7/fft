@@ -51,7 +51,10 @@ generate_waveform <- function(freq_hzs, amplitudes, decay_tau = NA, duration_s =
 ## Generate a more complex waveform
 
 ```{r}
-waveform_2 <- generate_waveform(c(4.0), c(1.0))
+waveform_2 <- generate_waveform(
+  c(1, 20, 30, 40, 50), 
+  rep(1.0, 5)
+)
 
 waveform_2  %>%
   ggplot(aes(x = t_samples, y = waveform_norm)) +
@@ -65,7 +68,11 @@ waveform_2  %>%
 
 ```{r}
 fft_df <- function(waveform_df) {
-  y <- fft(waveform_df$waveform_norm)
+  original_fft <- fft(waveform_df$waveform_norm)
+  print(length(original_fft))
+  
+  y <- original_fft[1:floor(length(original_fft) / 2)]
+  print(length(y))
   
   data.frame(
     fft_idx = seq_along(y),
@@ -82,6 +89,12 @@ Now make a plot of the FFT
 ```{r}
 waveform_2 %>%
   fft_df() %>%
-  ggplot(aes(x = fft_idx, y = fft_im)) +
-  geom_line()
+  ggplot(aes(x = fft_idx, y = fft_mod)) +
+  geom_point()
+```
+
+```{r}
+waveform_2 %>%
+  fft_df() %>%
+  filter(fft_mod > 1e-2)
 ```
