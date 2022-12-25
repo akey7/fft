@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Libraries
 
 ```{r}
-library(magrittr)
+library(dplyr)
 library(ggplot2)
 ```
 
@@ -25,16 +25,16 @@ theme_set(theme_linedraw(base_size = 15))
 ## Functions for generating waveforms
 
 ```{r}
-generate_waveform <- function(freq_hzs, amplitudes, decay_tau = NA, duration_s = 1.0, sps = 200) {
-  t_samples <- seq(sps * duration_s)
+generate_waveform <- function(freq_hzs, amplitudes, decay_tau = NA, duration_s = 1.0, sr = 200) {
+  t_samples <- seq(sr * duration_s)
   waveform_matrix = matrix(nrow = length(freq_hzs), ncol = length(t_samples))
   
   for (i in seq_along(freq_hzs)) {
     if (is.na(decay_tau)) {
-      waveform_matrix[i, ] <- amplitudes[i] * sin(2 * pi * freq_hzs[i] * t_samples / sps)
+      waveform_matrix[i, ] <- amplitudes[i] * cos(2 * pi * freq_hzs[i] * t_samples / sr)
     }
     else {
-      waveform_matrix[i, ] <- amplitudes[i] * sin(2 * pi * freq_hzs[i] * t_samples / sps) * exp(-t_samples / (decay_tau * sps))
+      waveform_matrix[i, ] <- amplitudes[i] * cos(2 * pi * freq_hzs[i] * t_samples / sr) * exp(-t_samples / (decay_tau * sr))
     }
   }
   
@@ -42,7 +42,8 @@ generate_waveform <- function(freq_hzs, amplitudes, decay_tau = NA, duration_s =
   
   data.frame(
     t_samples = t_samples,
-    waveform = wv
+    waveform = wv,
+    waveform_norm = wv / length(wv)
   )
 }
 ```
@@ -50,13 +51,37 @@ generate_waveform <- function(freq_hzs, amplitudes, decay_tau = NA, duration_s =
 ## Generate a more complex waveform
 
 ```{r}
-# waveform_2 <- generate_waveform(c(4.0), c(1.0), decay_tau = 0.25)
 waveform_2 <- generate_waveform(c(4.0), c(1.0))
-ggplot(waveform_2, aes(x = t_samples, y = waveform)) +
-  geom_line()
+
+waveform_2  %>%
+  ggplot(aes(x = t_samples, y = waveform_norm)) +
+    geom_line()
 ```
 
 ```{r}
-y <- fft(waveform_2$waveform)
-y
+# y <- fft(waveform_2$waveform / length(waveform_2$waveform))
+# y[which(Re(y) > 0.05 | Im(y) > 0.05)]
+```
+
+```{r}
+fft_df <- function(waveform_df) {
+  y <- fft(waveform_df$waveform_norm)
+  
+  data.frame(
+    fft_idx = seq_along(y),
+    fft_complex = y,
+    fft_re = Re(y),
+    fft_im = Im(y),
+    fft_mod = Mod(y)
+  )
+} 
+```
+
+Now make a plot of the FFT
+
+```{r}
+waveform_2 %>%
+  fft_df() %>%
+  ggplot(aes(x = fft_idx, y = fft_im)) +
+  geom_line()
 ```
