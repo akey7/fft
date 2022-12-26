@@ -24,9 +24,6 @@ waveform <- function(freq_hzs, amplitudes, decay_tau = NA, duration_s = 1.0, sr 
 }
 
 ff_transform <- function(waveform_df) {
-  # original_fft <- fft(waveform_df$waveform_norm)
-  # y <- original_fft[1:floor(length(original_fft) / 2)]
-  
   y <- fft(waveform_df$waveform_norm)
   
   data.frame(
