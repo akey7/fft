@@ -32,7 +32,7 @@ waveform_ggplot(original_waveform)
 
 ```{r}
 original_fft <- ff_transform(original_waveform)
-fft_ggplot(original_fft)
+fft_ggplot(original_fft, show_all = FALSE)
 ```
 
 ## Regenerate Waveform
