@@ -34,3 +34,10 @@ waveform_ggplot(original_waveform)
 original_fft <- ff_transform(original_waveform)
 fft_ggplot(original_fft)
 ```
+
+## Regenerate Waveform
+
+```{r}
+ift_waveform <- reconstruct_waveform(original_fft)
+waveform_ggplot(ift_waveform)
+```
