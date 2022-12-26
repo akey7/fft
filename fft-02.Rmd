@@ -24,7 +24,7 @@ theme_set(theme_linedraw(base_size = 15))
 ## Create and Plot Original Waveform
 
 ```{r}
-original_waveform <- waveform(c(2, 4, 8, 16), c(0.25, 0.5, 0.75, 1.0))
+original_waveform <- waveform(c(2, 4, 8, 16), c(0.25, 0.5, 0.75, 1.0), decay_tau = 0.5)
 waveform_ggplot(original_waveform)
 ```
 
