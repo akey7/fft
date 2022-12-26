@@ -41,12 +41,20 @@ waveform_ggplot <- function(waveform_df) {
     xlim(c(0, nrow(waveform_df)))
 }
 
-fft_ggplot <- function(fft_df, fft_mod_cutoff = 1e-2) {
-  fft_df %>%
-    filter(fft_mod > fft_mod_cutoff) %>%
-    ggplot() +
-    geom_segment(aes(x = fft_idx, y = 0, xend = fft_idx, yend = fft_mod)) +
-    xlim(c(0, nrow(fft_df)))
+fft_ggplot <- function(fft_df, fft_mod_cutoff = 1e-2, show_all = FALSE) {
+  half_row_count <- ceiling(nrow(fft_df) / 2)
+  
+  if (show_all) {
+    data_to_plot <- fft_df %>%
+      filter(fft_mod >= fft_mod_cutoff)
+  }
+  else {
+    data_to_plot <- fft_df %>%
+      filter(fft_idx <= half_row_count, fft_mod >= fft_mod_cutoff)
+  }
+
+  ggplot(data_to_plot, aes(x = fft_idx, y = 0, xend = fft_idx, yend = fft_mod)) +
+    geom_segment()
 }
 
 reconstruct_waveform <- function(fft_df, mod_threshold = 1e-2, duration_s = 1.0, sr = 200) {
