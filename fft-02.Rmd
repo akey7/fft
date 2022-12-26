@@ -1,0 +1,43 @@
+---
+title: "fft-02"
+author: "Alicia Key"
+date: "2022-12-25"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Source functions
+
+```{r}
+source("fft_functions.R")
+```
+
+## Set a theme
+
+```{r}
+theme_set(theme_linedraw(base_size = 15))
+```
+
+## Create and Plot Original Waveform
+
+```{r}
+original_waveform <- waveform(c(2, 4, 8, 16), c(0.25, 0.5, 0.75, 1.0))
+waveform_ggplot(original_waveform)
+```
+
+## Create and Plot FFT
+
+```{r}
+original_fft <- ff_transform(original_waveform)
+fft_ggplot(original_fft)
+```
+
+## Regenerate Waveform
+
+```{r}
+ift_waveform <- reconstruct_waveform(original_fft)
+waveform_ggplot(ift_waveform)
+```
